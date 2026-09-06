@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import csv
 import io
 import json
 import os
@@ -26,6 +27,21 @@ CORS(app)
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 DB_PATH = os.path.join(BASE_DIR, "data", "data.db")
+TICKERS_PATH = os.path.join(BASE_DIR, "frontend", "data", "tickers.csv")
+
+
+def load_ticker_names() -> dict[str, str]:
+    names = {}
+    try:
+        with open(TICKERS_PATH, newline="", encoding="utf-8") as ticker_file:
+            for row in csv.DictReader(ticker_file):
+                symbol = (row.get("Symbol") or "").strip().upper()
+                name = (row.get("Name") or "").strip()
+                if symbol and name:
+                    names[symbol] = name
+    except (OSError, csv.Error):
+        pass
+    return names
 
 
 def query_db(symbol: str, start: str, end: str) -> List[tuple]:
@@ -183,6 +199,7 @@ def api_plot():
         return Response(buf.getvalue(), mimetype="image/png")
 
     fig, ax = plt.subplots(figsize=(24, 8))
+    ticker_names = load_ticker_names()
     for symbol in symbols:
         ensure_data_for_range(symbol, start_date, end_date)
         rows = query_db(symbol, start_date.isoformat(), end_date.isoformat())
@@ -205,12 +222,13 @@ def api_plot():
 
         series = pd.Series(closes, index=pd.DatetimeIndex(dates), name=symbol)
         series = series.sort_index()
-        ax.plot(series.index, series.values, label=symbol, linewidth=2)
+        name = ticker_names.get(symbol, symbol)
+        ax.plot(series.index, series.values, label=f"{symbol}: {name}", linewidth=2)
 
     ax.set_title(plot_title)
     ax.set_xlabel("Date")
     ax.set_ylabel("Close")
-    ax.legend()
+    ax.legend(loc="upper left")
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%d-%m-%Y"))
     ax.xaxis.set_major_locator(mdates.AutoDateLocator())
     fig.autofmt_xdate()

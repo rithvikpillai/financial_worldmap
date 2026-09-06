@@ -18,14 +18,21 @@ body{
 .tab.active{background:#000080;color:#fff;border-top:2px solid #000;border-left:2px solid #000;border-bottom:2px solid #fff;border-right:2px solid #fff}
 
 .content{background:#ffffff;border:4px ridge #000;padding:16px;min-height:360px}
+.content-heading-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.content-heading-row h2{margin-top:0}
+.market-source-url{margin:-6px 0 12px;color:#666;font-size:11px;overflow-wrap:anywhere}
+.market-last-updated{margin:-8px 0 12px;color:#888;font-size:11px}
 .card{background:#f8f8f8;padding:10px;margin-bottom:10px;border:2px outset #fff}
 .plot-stack{margin-top:12px;text-align:center}
 .plot-card{margin-bottom:12px;text-align:left}
 .plot-heading{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
-.plot-title{width:280px;border:1px solid #000;background:#fff;padding:4px 6px}
+.plot-title{width:min(560px,100%);border:1px solid #000;background:#fff;padding:4px 6px}
 .plot-output{text-align:center;margin-top:12px;min-height:20px}
 .plot-status{display:inline-block;margin-left:12px;color:#000;font-weight:bold}
 .plot-card .combo .suggestions{position:fixed;z-index:10000;margin:0;min-width:0;max-width:none;}
+.add-plot{display:block;margin:12px auto 2px;min-width:52px;min-height:44px;background:#e0e0e0;border-top:2px solid #fff;border-left:2px solid #fff;border-bottom:2px solid #000;border-right:2px solid #000;font-family:inherit;font-size:28px;font-weight:bold;line-height:1;cursor:pointer;color:#000}
+.add-plot:hover{background:#fff}
+.add-plot:active{border-top-color:#000;border-left-color:#000;border-bottom-color:#fff;border-right-color:#fff}
 .card h3{margin:0 0 8px;font-size:14px}
 .plot-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
 .plot-item{background:#ffffff;padding:10px;border:2px dashed #000;color:#000}

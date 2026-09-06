@@ -28,6 +28,14 @@ CORS(app)
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 DB_PATH = os.path.join(BASE_DIR, "data", "data.db")
 TICKERS_PATH = os.path.join(BASE_DIR, "frontend", "data", "tickers.csv")
+Y_VALUE_LABELS = {
+    "open": "Open",
+    "high": "High",
+    "low": "Low",
+    "close": "Close",
+    "volume": "Volume",
+    "market_value": "Market Value",
+}
 
 
 def load_ticker_names() -> dict[str, str]:
@@ -50,7 +58,7 @@ def query_db(symbol: str, start: str, end: str) -> List[tuple]:
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
     cur.execute(
-        "SELECT timestamp, open, high, low, close FROM daily_stock WHERE symbol = ? AND timestamp BETWEEN ? AND ? ORDER BY timestamp",
+        "SELECT timestamp, open, high, low, close, volume FROM daily_stock WHERE symbol = ? AND timestamp BETWEEN ? AND ? ORDER BY timestamp",
         (symbol, start, end),
     )
     rows = cur.fetchall()
@@ -127,6 +135,10 @@ def api_plot():
     start = data.get("start")
     end = data.get("end")
     plot_title = data.get("title") or "Timeseries Stock Price Plot"
+    plot_type = data.get("plot_type") or "timeseries"
+    y_value = data.get("y_value") or "close"
+    if y_value not in Y_VALUE_LABELS:
+        return jsonify({"error": "invalid y value"}), 400
     if not start or not end:
         return jsonify({"error": "start and end dates required in YYYY-MM-DD"}), 400
     try:
@@ -137,6 +149,48 @@ def api_plot():
 
     if not symbols:
         return jsonify({"error": "at least one ticker is required"}), 400
+
+    if plot_type in ("histogram", "treemap"):
+        ticker_names = load_ticker_names()
+        histogram_series = []
+        for symbol in symbols:
+            ensure_data_for_range(symbol, start_date, end_date)
+            rows = query_db(symbol, start_date.isoformat(), end_date.isoformat())
+            if not rows:
+                return jsonify({"error": f"no data found for symbol in range: {symbol}"}), 404
+            points = []
+            for row in rows:
+                raw_date = row[0].split(" ")[0] if " " in row[0] else row[0]
+                try:
+                    values = {"open": float(row[1]), "high": float(row[2]), "low": float(row[3]), "close": float(row[4]), "volume": float(row[5] or 0)}
+                    values["market_value"] = values["volume"] * values["close"]
+                    points.append({"date": raw_date, "value": values[y_value]})
+                except (TypeError, ValueError):
+                    continue
+            if not points:
+                return jsonify({"error": f"no valid close rows found for symbol: {symbol}"}), 404
+            histogram_series.append({"symbol": symbol, "name": ticker_names.get(symbol, symbol), "value_label": Y_VALUE_LABELS[y_value], "points": points})
+
+        if data.get("data_only"):
+            return jsonify({"series": histogram_series})
+
+        fig, ax = plt.subplots(figsize=(24, 8))
+        colors = plt.get_cmap("tab10").colors
+        for symbol_index, series in enumerate(histogram_series):
+            ax.hist([point["price"] for point in series["points"]], bins=30, alpha=0.55, color=colors[symbol_index % len(colors)], label=f"{series['symbol']}: {series['name']}")
+        ax.set_title(plot_title)
+        ax.set_xlabel("Price")
+        ax.set_ylabel("Frequency")
+        ax.legend(loc="upper left")
+        fig.tight_layout()
+        buf = io.BytesIO()
+        try:
+            fig.savefig(buf, format="png", bbox_inches="tight")
+        except Exception as e:
+            return jsonify({"error": f"failed to render histogram: {e}"}), 500
+        plt.close(fig)
+        buf.seek(0)
+        return Response(buf.getvalue(), mimetype="image/png")
 
     if len(symbols) == 1:
         symbol = symbols[0]
@@ -160,7 +214,9 @@ def api_plot():
             opens.append(float(r[1]))
             highs.append(float(r[2]))
             lows.append(float(r[3]))
-            closes.append(float(r[4]))
+            values = {"open": float(r[1]), "high": float(r[2]), "low": float(r[3]), "close": float(r[4]), "volume": float(r[5] or 0)}
+            values["market_value"] = values["volume"] * values["close"]
+            closes.append(values[y_value])
 
         if len(dates) == 0:
             return jsonify({"error": "no valid date rows found"}), 404
@@ -215,7 +271,9 @@ def api_plot():
                 dates.append(datetime.date.fromisoformat(date_part))
             except Exception:
                 continue
-            closes.append(float(r[4]))
+            values = {"open": float(r[1]), "high": float(r[2]), "low": float(r[3]), "close": float(r[4]), "volume": float(r[5] or 0)}
+            values["market_value"] = values["volume"] * values["close"]
+            closes.append(values[y_value])
 
         if len(dates) == 0:
             return jsonify({"error": f"no valid date rows found for symbol: {symbol}"}), 404
@@ -227,7 +285,7 @@ def api_plot():
 
     ax.set_title(plot_title)
     ax.set_xlabel("Date")
-    ax.set_ylabel("Close")
+    ax.set_ylabel(Y_VALUE_LABELS[y_value])
     ax.legend(loc="upper left")
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%d-%m-%Y"))
     ax.xaxis.set_major_locator(mdates.AutoDateLocator())

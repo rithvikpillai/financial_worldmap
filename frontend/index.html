@@ -13,36 +13,15 @@
     <marquee class="marquee" behavior="scroll" scrollamount="6">Welcome to the Financial Worldmap | Best viewed on a computer</marquee>
   </header>
 
-  <section class="controls card" id="controls">
-    <div class="controls-row controls-row-tickers">
-      <div class="ticker-group">
-        <label style="margin-right:8px">Ticker:</label>
-        <div id="selected-tickers" class="selected-tickers" aria-live="polite"></div>
-      </div>
-    </div>
-    <div class="controls-row controls-row-fields">
-      <span class="combo">
-        <div class="search-box">
-          <input type="text" id="ticker" value="" autocomplete="off" aria-haspopup="listbox" aria-expanded="false" placeholder="Search tickers...">
-          <button id="ticker-toggle" class="dropdown-toggle" aria-label="Show suggestions">▾</button>
-        </div>
-        <ul id="ticker-suggestions" class="suggestions" role="listbox" hidden></ul>
-      </span>
-      <label style="margin-right:8px">Start: <input type="date" id="start"></label>
-      <label style="margin-right:8px">End: <input type="date" id="end"></label>
-      <button id="execute" class="tab">Execute Query</button>
-      <div id="status" style="display:inline-block;margin-left:12px;color:#000;font-weight:bold"></div>
-    </div>
-  </section>
-
   <nav id="tabs" class="tabs" aria-label="Categories"></nav>
 
   <main id="content" class="content" role="main"></main>
 
-  <section class="card" id="plot-area" style="margin-top:12px; text-align:center">
+  <section class="plot-stack" id="plot-area" aria-label="Stock plots">
     <div id="plot-container"></div>
   </section>
 
+  <script src="plot-cards.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

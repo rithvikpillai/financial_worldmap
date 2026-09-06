@@ -1,0 +1,8 @@
+requests
+python-dotenv
+yfinance
+pandas
+flask
+flask-cors
+matplotlib
+mplfinance

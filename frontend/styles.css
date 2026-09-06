@@ -1,0 +1,55 @@
+
+/* 90's retro styling */
+*{box-sizing:border-box}
+body{
+  font-family: "Courier New", Courier, monospace;
+  background: repeating-linear-gradient(45deg,#cfe9ff 0 8px,#f0f8ff 8px 16px);
+  color:#000;margin:0;padding:20px;
+}
+.site-header{margin-bottom:12px;padding:10px;border:4px outset #ffffff;background:#ffff99;text-align:center}
+.site-header h1{margin:0;font-size:34px;color:#000;text-shadow:1px 1px 0 #fff}
+.subtitle{margin:6px 0 0;color:#333;font-size:12px}
+.marquee{margin-top:8px;background:#ffcc00;color:#000;padding:6px;border:2px inset #fff}
+
+/* Tabs styled like old beveled buttons */
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0}
+.tab{background:#e0e0e0;border-top:2px solid #ffffff;border-left:2px solid #ffffff;border-bottom:2px solid #000000;border-right:2px solid #000000;padding:6px 10px;cursor:pointer;font-weight:bold;color:#000}
+.tab:hover{background:#fff}
+.tab.active{background:#000080;color:#fff;border-top:2px solid #000;border-left:2px solid #000;border-bottom:2px solid #fff;border-right:2px solid #fff}
+
+.content{background:#ffffff;border:4px ridge #000;padding:16px;min-height:360px}
+.card{background:#f8f8f8;padding:10px;margin-bottom:10px;border:2px outset #fff}
+.card h3{margin:0 0 8px;font-size:14px}
+.plot-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.plot-item{background:#ffffff;padding:10px;border:2px dashed #000;color:#000}
+
+/* Ticker suggestions dropdown */
+.suggestions{list-style:none;margin:4px 0 0;padding:0;border:1px solid #000;background:#fff;max-height:300px;overflow:auto;width:220px;box-sizing:border-box}
+.suggestions[hidden]{display:none}
+.suggestions li{display:block;padding:8px 10px;border-bottom:1px solid #eee;cursor:pointer;color:#000;line-height:20px;min-height:20px;box-sizing:border-box}
+.suggestions li:hover{background:#f0f8ff}
+.controls label{position:relative}
+.selected-tickers{display:flex;flex-wrap:wrap;gap:6px;margin:0;min-height:26px;overflow:hidden;white-space:nowrap}
+.selected-ticker-chip{display:inline-flex;align-items:center;justify-content:center;padding:4px 8px;font-size:12px;font-weight:700;line-height:1.2;cursor:pointer;border:2px outset #fff;background:rgba(255,255,255,0.9);border-radius:0;box-shadow:inset 1px 1px 0 #fff,inset -1px -1px 0 #000}
+.selected-ticker-chip:hover{filter:brightness(0.96)}
+.controls-row{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+.controls-row-tickers{margin-bottom:10px}
+.ticker-group{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+
+/* Combobox styling */
+.combo{position:relative;display:inline-block;vertical-align:middle}
+.search-box{position:relative;display:inline-block}
+.search-box input{width:180px;padding:6px 28px 6px 8px;border:1px solid #000;background:#fff;display:block}
+.search-box .dropdown-toggle{position:absolute;right:2px;top:2px;height:calc(100% - 4px);width:26px;border:1px solid #000;background:#e0e0e0;cursor:pointer;font-weight:bold;line-height:1;padding:0}
+.dropdown-toggle:active{background:#d0d0d0}
+.combo .suggestions{position:absolute;left:0;top:calc(100% + 4px);min-width:100%;width:auto;z-index:10000;box-shadow:0 6px 18px rgba(0,0,0,0.2);background:#ffffff;border-radius:4px;max-height:360px;overflow-y:auto}
+.combo .suggestions li{display:block;padding:8px 10px;border-bottom:1px solid #eee;color:#000;line-height:20px;min-height:20px}
+.combo .suggestions li:hover{background:#f0f8ff}
+.combo{z-index:1000}
+
+/* small screen tweaks */
+@media (max-width:600px){
+  body{padding:8px}
+  .site-header h1{font-size:22px}
+}
+
